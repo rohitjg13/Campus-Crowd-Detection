@@ -1,1 +1,5 @@
 .DS_Store
+yolov8x.pt
+.gitignore
+yolov8n.pt
+yolov8m.pt
