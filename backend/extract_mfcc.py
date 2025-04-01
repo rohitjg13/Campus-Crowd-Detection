@@ -1,13 +1,14 @@
 import librosa
 import numpy as np
+import pandas as pd
 from datetime import datetime
 
-AUDIO_FILE = "test_audio/output.wav" 
-DURATION = 2  # 2 seconds to read
-SAMPLERATE = 16000  # 16 kHz
-N_MFCC = 13  # 13 MFCCs per frame
-FRAME_LENGTH = 0.025  # 25ms frame size
-HOP_LENGTH = 0.010  # 10ms hop length
+AUDIO_FILE = "backend/test_audio/input.wav"
+DURATION = 2
+SAMPLERATE = 16000
+N_MFCC = 13
+FRAME_LENGTH = 0.025
+HOP_LENGTH = 0.010
 
 def load_audio(file_path, duration, sr=SAMPLERATE):
     y, sr = librosa.load(file_path, sr=sr, duration=duration)
@@ -19,25 +20,42 @@ def extract_mfcc(audio, samplerate, n_mfcc=13):
                                  hop_length=int(HOP_LENGTH * samplerate))
     return mfccs.T
 
-def save_mfcc_to_txt(mfcc_data, filename="mfcc_raw_data.txt"):
-    """Save the MFCC data to a text file for inspection"""
-    with open(filename, 'w') as f:
-        f.write(f"MFCC Shape: {mfcc_data.shape}\n\n")
-        f.write("MFCC Data (each row is a frame, each column is a coefficient):\n")
-        np.savetxt(f, mfcc_data, fmt='%.6f', delimiter=',')
-    print(f"Raw MFCC data saved to {filename}")
+def save_mfcc_to_csv(mfcc_data, location_id, filename="mfcc_dataset.csv"):
+    num_frames, num_coeffs = mfcc_data.shape
+    mfcc_flattened = mfcc_data.flatten().tolist()
+    
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%d")
+    day_of_week = now.strftime("%A")
+    current_time = now.strftime("%I:%M %p")
+    
+    headers = ["Date", "Day", "Time", "Location_ID"]
+    for frame in range(num_frames):
+        for coef in range(num_coeffs):
+            headers.append(f"MFCC_{frame+1}_{coef+1}")
+    headers.append("Crowd_Density")
+    
+    crowd_density = 0.5  # Replace with actual measurement
+    
+    row = [date_str, day_of_week, current_time, location_id] + mfcc_flattened + [crowd_density]
+    
+    file_exists = False
+    try:
+        with open(filename, 'r'):
+            file_exists = True
+    except FileNotFoundError:
+        pass
+    
+    with open(filename, 'a', newline='') as csvfile:
+        writer = pd.DataFrame([row], columns=headers)
+        writer.to_csv(csvfile, header=not file_exists, index=False)
+    
+    print(f"MFCC data saved to {filename}")
 
 audio_data, sr = load_audio(AUDIO_FILE, DURATION)
 mfcc_data = extract_mfcc(audio_data, sr)
 
-save_mfcc_to_txt(mfcc_data)
+location_id = "location_1"  # Replace with actual location identifier
+save_mfcc_to_csv(mfcc_data, location_id)
 
-num_frames, num_coeffs = mfcc_data.shape
-print(f"MFCC shape: {mfcc_data.shape} (frames × coefficients)")
-
-mfcc_flattened = mfcc_data.flatten().tolist()
-
-now = datetime.now()
-date_str = now.strftime("%Y-%m-%d")
-day_of_week = now.strftime("%A")
-current_time = now.strftime("%I:%M %p")
+print(f"MFCC shape: {mfcc_data.shape}")
