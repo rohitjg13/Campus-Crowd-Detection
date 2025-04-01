@@ -9,11 +9,12 @@ model = YOLO("yolov8x.pt")
 # results = model.predict("backend/test13.jpg")
 camera = Camera()
 system("mkdir /tmp/cv")
-camera.start_preview()
+# camera.start_preview()
 camera.take_photo("/tmp/cv/test.jpg")
-camera.stop_preview()
+# camera.take_photo("~/Desktop/test.jpg")
+# camera.stop_preview()
 results = model.predict("/tmp/cv/test.jpg")
-system("rm /tmp/cv/test.jpg")
+# system("rm -rf /tmp/cv")
 result = results[0]
 people = 0
 for box in result.boxes:
