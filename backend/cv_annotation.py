@@ -4,7 +4,7 @@ import numpy as np
 
 model = YOLO("yolov10x.pt")
 
-image_path = "/Users/rohitjg/Downloads/test14.jpg"
+image_path = "/tmp/cv/test.jpg"
 
 results = model.predict(image_path)
 result = results[0]
