@@ -35,7 +35,7 @@ def save_mfcc_to_csv(mfcc_data, location_id, filename="mfcc_dataset.csv"):
             headers.append(f"MFCC_{frame+1}_{coef+1}")
     headers.append("Crowd_Density")
     
-    crowd_density = 0.5  # Replace with actual measurement
+    crowd_density = 0.5
     
     row = [date_str, day_of_week, current_time, location_id] + mfcc_flattened + [crowd_density]
     
@@ -55,7 +55,7 @@ def save_mfcc_to_csv(mfcc_data, location_id, filename="mfcc_dataset.csv"):
 audio_data, sr = load_audio(AUDIO_FILE, DURATION)
 mfcc_data = extract_mfcc(audio_data, sr)
 
-location_id = "location_1"  # Replace with actual location identifier
+location_id = "location_1"
 save_mfcc_to_csv(mfcc_data, location_id)
 
 print(f"MFCC shape: {mfcc_data.shape}")
