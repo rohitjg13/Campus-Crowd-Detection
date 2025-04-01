@@ -20,7 +20,7 @@ def extract_mfcc(audio, samplerate, n_mfcc=13):
                                  hop_length=int(HOP_LENGTH * samplerate))
     return mfccs.T
 
-def save_mfcc_to_csv(mfcc_data, location_id, filename="mfcc_dataset.csv"):
+def save_mfcc_to_csv(mfcc_data, location_id, crowd_density=0.5, filename="mfcc_dataset.csv"):
     num_frames, num_coeffs = mfcc_data.shape
     mfcc_flattened = mfcc_data.flatten().tolist()
     
@@ -29,15 +29,12 @@ def save_mfcc_to_csv(mfcc_data, location_id, filename="mfcc_dataset.csv"):
     day_of_week = now.strftime("%A")
     current_time = now.strftime("%I:%M %p")
     
-    headers = ["Date", "Day", "Time", "Location_ID"]
+    headers = ["Date", "Day", "Time", "Location_ID", "Crowd_Density"]
     for frame in range(num_frames):
         for coef in range(num_coeffs):
             headers.append(f"MFCC_{frame+1}_{coef+1}")
-    headers.append("Crowd_Density")
     
-    crowd_density = 0.5
-    
-    row = [date_str, day_of_week, current_time, location_id] + mfcc_flattened + [crowd_density]
+    row = [date_str, day_of_week, current_time, location_id, crowd_density] + mfcc_flattened
     
     file_exists = False
     try:
@@ -56,6 +53,5 @@ audio_data, sr = load_audio(AUDIO_FILE, DURATION)
 mfcc_data = extract_mfcc(audio_data, sr)
 
 location_id = "location_1"
-save_mfcc_to_csv(mfcc_data, location_id)
-
-print(f"MFCC shape: {mfcc_data.shape}")
+crowd_density = 0.65
+save_mfcc_to_csv(mfcc_data, location_id, crowd_density)
