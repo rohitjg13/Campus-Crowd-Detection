@@ -6,8 +6,7 @@ import wave
 import struct
 import Adafruit_ADS1x15 as ADS
 
-
-from adafruit_ads1x15.analog_in import AnalogIn
+from Adafruit_ADS1x15.analog_in import AnalogIn
 
 # Parameters
 SAMPLE_RATE = 3000  # Hz - adjust based on your needs
@@ -16,11 +15,11 @@ NUM_SAMPLES = SAMPLE_RATE * DURATION
 CHANNELS = 3  # Number of microphones
 
 # Create the I2C bus
-# i2c = busio.I2C(board.SCL, board.SDA)
+i2c = busio.I2C(board.SCL, board.SDA)
 
 # Create the ADC object using the I2C bus
 # Using ADS1115 for higher resolution (16-bit) compared to ADS1015 (12-bit)
-ads = ADS.ADS1115(address=0x48, busnum=1)
+ads = ADS.ADS1115(i2c)
 
 # Set the gain - adjust based on your microphone output range
 # Options: 2/3, 1, 2, 4, 8, 16

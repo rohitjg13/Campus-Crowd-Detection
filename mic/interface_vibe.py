@@ -1,13 +1,11 @@
+import struct
 import time
+import wave
+import Adafruit_ADS1x15 as ADS
 import board
 import busio
 import numpy as np
-import wave
-import struct
-import Adafruit_ADS1x15 as ADS
-
-
-from adafruit_ads1x15.analog_in import AnalogIn
+from smbus import SMBus  # For direct SMBus access
 
 # Parameters
 SAMPLE_RATE = 3000  # Hz - adjust based on your needs
@@ -15,47 +13,43 @@ DURATION = 3  # seconds
 NUM_SAMPLES = SAMPLE_RATE * DURATION
 CHANNELS = 3  # Number of microphones
 
-# Create the I2C bus
-# i2c = busio.I2C(board.SCL, board.SDA)
-
 # Create the ADC object using the I2C bus
 # Using ADS1115 for higher resolution (16-bit) compared to ADS1015 (12-bit)
-ads = ADS.ADS1115(address=0x48, busnum=1)
-
-# Set the gain - adjust based on your microphone output range
-# Options: 2/3, 1, 2, 4, 8, 16
-ads.gain = 1
-
-# Create analog inputs for the three microphones
-mic1 = AnalogIn(ads, ADS.P0)
-mic2 = AnalogIn(ads, ADS.P1)
-mic3 = AnalogIn(ads, ADS.P2)
-
-# Create arrays to store the samples
-data = np.zeros((CHANNELS, NUM_SAMPLES), dtype=np.int16)
-
-# Set the data rate (samples per second)
-# ADS1115 supports up to ~860 SPS max
-ads.data_rate = 860
+ads = ADS.ADS1115(busnum=1, address=0x48)  # Use your device's address (0x48-0x4B)
 
 print(f"Recording for {DURATION} seconds...")
 print(f"Target sample rate: {SAMPLE_RATE} Hz")
 
+# Create arrays to store the samples
+data = np.zeros((CHANNELS, NUM_SAMPLES), dtype=np.int16)
+
 # Calculate delay between samples to achieve target sample rate
-# Note: Due to overhead, actual rate may be lower
 delay = 1.0 / SAMPLE_RATE
-
 start_time = time.monotonic()
+
+# Calculate voltage conversion factor
+# ADS1115 with gain of 1 has a range of ±4.096V
+# But most likely your microphones use a smaller range (0-3.3V typically)
+full_scale_voltage = 4.096
+scale_factor = 32767 / 3.3  # Scaling from typical 3.3V range to 16-bit signed int
+
 for i in range(NUM_SAMPLES):
-    # Read from each microphone and convert voltage to 16-bit PCM
-    # Scale factor converts voltage (typically 0-3.3V) to 16-bit range (-32768 to 32767)
-    scale_factor = 32767 / 3.3  # Adjust if your reference voltage is different
-
-    # Read and scale each microphone value
-    data[0, i] = int((mic1.voltage - 1.65) * scale_factor)  # Offset by 1.65V (half of 3.3V) to center at 0
-    data[1, i] = int((mic2.voltage - 1.65) * scale_factor)
-    data[2, i] = int((mic3.voltage - 1.65) * scale_factor)
-
+    # Read from each microphone and convert to voltage
+    # For the older library, we need to use read_adc methods
+    raw_value0 = ads.read_adc(0, gain=GAIN)  # Channel 0
+    raw_value1 = ads.read_adc(1, gain=GAIN)  # Channel 1
+    raw_value2 = ads.read_adc(2, gain=GAIN)  # Channel 2
+    
+    # Convert raw ADC values to voltage
+    voltage0 = raw_value0 * (full_scale_voltage / 32767)
+    voltage1 = raw_value1 * (full_scale_voltage / 32767)
+    voltage2 = raw_value2 * (full_scale_voltage / 32767)
+    
+    # Scale and center around 0 for audio
+    data[0, i] = int((voltage0 - 1.65) * scale_factor)
+    data[1, i] = int((voltage1 - 1.65) * scale_factor)
+    data[2, i] = int((voltage2 - 1.65) * scale_factor)
+    
     # Wait for next sample time
     next_sample_time = start_time + ((i + 1) * delay)
     current_time = time.monotonic()
@@ -71,16 +65,16 @@ print(f"Actual duration: {actual_duration:.2f} seconds")
 
 # Save to WAV file
 filename = "microphone_recording.wav"
-with wave.open(filename, 'w') as wf:
+with wave.open(filename, "w") as wf:
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(2)  # 2 bytes for 16-bit samples
     wf.setframerate(int(actual_sample_rate))
-
+    
     # Interleave the channels
     interleaved = np.empty(CHANNELS * NUM_SAMPLES, dtype=np.int16)
     for i in range(CHANNELS):
         interleaved[i::CHANNELS] = data[i]
-
+    
     # Write the interleaved data
     wf.writeframes(interleaved.tobytes())
 
