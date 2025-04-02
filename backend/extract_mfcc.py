@@ -2,6 +2,7 @@ import librosa
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import random
 
 AUDIO_FILE = "backend/test_audio/input.wav"
 DURATION = 2
@@ -20,20 +21,18 @@ def extract_mfcc(audio, samplerate, n_mfcc=13):
                                  hop_length=int(HOP_LENGTH * samplerate))
     return mfccs.T
 
-def save_mfcc_to_csv(mfcc_data, location_id, crowd_density=0.5, filename="mfcc_dataset.csv"):
+def save_mfcc_to_csv(time ,mfcc_data, location_id, crowd_density=0.5, filename="mfcc_dataset.csv"):
     num_frames, num_coeffs = mfcc_data.shape
     mfcc_flattened = mfcc_data.flatten().tolist()
-    
-    now = datetime.now()
-    date_str = now.strftime("%Y-%m-%d")
-    day_of_week = now.strftime("%A")
-    current_time = now.strftime("%I:%M %p")
+    current_time = time
     
     headers = ["Date", "Day", "Time", "Location_ID", "Crowd_Density"]
     for frame in range(num_frames):
         for coef in range(num_coeffs):
             headers.append(f"MFCC_{frame+1}_{coef+1}")
     
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    day_of_week = datetime.now().strftime("%A")
     row = [date_str, day_of_week, current_time, location_id, crowd_density] + mfcc_flattened
     
     file_exists = False
@@ -52,6 +51,12 @@ def save_mfcc_to_csv(mfcc_data, location_id, crowd_density=0.5, filename="mfcc_d
 audio_data, sr = load_audio(AUDIO_FILE, DURATION)
 mfcc_data = extract_mfcc(audio_data, sr)
 
-location_id = "location_1"
-crowd_density = 0.65
-save_mfcc_to_csv(mfcc_data, location_id, crowd_density)
+location_ids = ["location_1", "location_2", "location_3"]
+start_time = datetime.strptime("09:00", "%H:%M")
+
+for i in range(200):
+    crowd_density = round(random.uniform(0, 1), 1)
+    current_time = (start_time + pd.Timedelta(minutes=i * 5)).strftime("%I:%M %p")
+    print(f"Current time: {current_time}, Crowd Density: {crowd_density}")
+    for location_id in location_ids:
+        save_mfcc_to_csv(current_time, mfcc_data, location_id, crowd_density, filename="mfcc_dataset.csv")

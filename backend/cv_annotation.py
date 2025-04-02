@@ -1,13 +1,21 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
+from picamzero import Camera
+from os import system
 
 model = YOLO("yolov10x.pt")
 
 image_path = "/tmp/cv/test.jpg"
 
+camera = Camera()
+system("mkdir /tmp/cv")
+camera.take_photo(image_path)
+
 results = model.predict(image_path)
 result = results[0]
+
+
 
 image = cv2.imread(image_path)
 
