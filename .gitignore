@@ -7,3 +7,4 @@ yolov8m.pt
 pyproject.toml
 uv.lock
 recorded_audio.wav
+fixed_audio.wav
