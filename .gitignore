@@ -6,3 +6,4 @@ yolov8m.pt
 .python-version
 pyproject.toml
 uv.lock
+recorded_audio.wav
