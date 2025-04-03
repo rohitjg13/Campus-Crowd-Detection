@@ -54,9 +54,10 @@ mfcc_data = extract_mfcc(audio_data, sr)
 location_ids = ["location_1", "location_2", "location_3"]
 start_time = datetime.strptime("09:00", "%H:%M")
 
-for i in range(200):
-    crowd_density = round(random.uniform(0, 1), 1)
-    current_time = (start_time + pd.Timedelta(minutes=i * 5)).strftime("%I:%M %p")
-    print(f"Current time: {current_time}, Crowd Density: {crowd_density}")
-    for location_id in location_ids:
-        save_mfcc_to_csv(current_time, mfcc_data, location_id, crowd_density, filename="mfcc_dataset.csv")
+def data(inp):
+    for i in range(200):
+        crowd_density = inp
+        current_time = (start_time + pd.Timedelta(minutes=i * 5)).strftime("%I:%M %p")
+        print(f"Current time: {current_time}, Crowd Density: {crowd_density}")
+        for location_id in location_ids:
+            save_mfcc_to_csv(current_time, mfcc_data, location_id, crowd_density, filename="mfcc_dataset.csv")
