@@ -15,8 +15,6 @@ camera.take_photo(image_path)
 results = model.predict(image_path)
 result = results[0]
 
-
-
 image = cv2.imread(image_path)
 
 people = 0
