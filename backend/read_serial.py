@@ -4,12 +4,15 @@ import struct
 import time
 
 ser = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-wav_file = wave.open("actual_hehe.wav", "wb")
+
+filename = f"recorded_audio_{int(time.time())}.wav"
+wav_file = wave.open(filename, "wb")
+
 wav_file.setnchannels(1)  # Mono
 wav_file.setsampwidth(2)  # 16-bit PCM
-wav_file.setframerate(8000)  # Ensure playback at 8kHz
+wav_file.setframerate(8000)  # 8kHz sample rate
 
-print("🎙️ Recording... Press Ctrl+C to stop.")
+print(f"🎙️ Recording... Saving to {filename}. Press Ctrl+C to stop.")
 
 try:
     while True:
@@ -24,9 +27,8 @@ try:
                 wav_file.writeframes(struct.pack('<h', sample))
             except:
                 pass
-            time.sleep(10)
 
 except KeyboardInterrupt:
-    print("\n📁 Saved as 'recorded_audio.wav'")
+    print(f"\n📁 Saved as '{filename}'")
     wav_file.close()
     ser.close()
