@@ -3,7 +3,7 @@ import wave
 import struct
 import time  # Import time module
 
-ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=1)
+ser = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
 
 # Generate a unique filename using timestamp
 filename = f"actual_hehe_{int(time.time())}.wav"

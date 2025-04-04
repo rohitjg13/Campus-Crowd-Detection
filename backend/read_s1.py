@@ -3,7 +3,7 @@ import wave
 import struct
 import time
 
-ser = serial.Serial("/dev/ttyAMA0", 9600, timeout=1)
+ser = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
 print(ser.read())
 wav_file = wave.open("recorded_audio.wav", "wb")
 wav_file.setnchannels(1)  # Mono
