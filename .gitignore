@@ -1,6 +1,5 @@
 .DS_Store
 yolov8x.pt
-.gitignore
 yolov8n.pt
 yolov8m.pt
 .python-version
@@ -8,3 +7,5 @@ pyproject.toml
 uv.lock
 recorded_audio.wav
 fixed_audio.wav
+.venv
+.idea
