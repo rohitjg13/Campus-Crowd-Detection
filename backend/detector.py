@@ -3,6 +3,8 @@ import cv_annotation
 import extract_mfcc
 
 while True:
-    p = 1 if cv_annotation.process() > 20 else 0
+    min_crowd = 0
+    max_crowd = 20
+    p = (cv_annotation.process() - min_crowd) / (max_crowd - min_crowd)
     extract_mfcc.data(p)
     time.sleep(5)
