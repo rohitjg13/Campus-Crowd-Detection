@@ -2,18 +2,12 @@ import serial
 import wave
 import struct
 import time
-<<<<<<< HEAD
 
 ser = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
 
 filename = f"recorded_audio_{int(time.time())}.wav"
 wav_file = wave.open(filename, "wb")
 
-=======
-
-ser = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
-wav_file = wave.open("recorded_audio.wav", "wb")
->>>>>>> f7f4ea9 (audio fix)
 wav_file.setnchannels(1)  # Mono
 wav_file.setsampwidth(2)  # 16-bit PCM
 wav_file.setframerate(8000)  # 8kHz sample rate
@@ -28,19 +22,11 @@ try:
             sample = struct.unpack('<H', low_byte + high_byte)[0]
 
             # Convert 10-bit (0-1023) to 16-bit (-32768 to 32767)
-<<<<<<< HEAD
             sample = int((sample - 512) * 32)
             try:
                 wav_file.writeframes(struct.pack('<h', sample))
             except:
                 pass
-=======
-#            sample = int((sample - 512) * 32)
-            print(sample)
-#            time.sleep(500)
-
-            wav_file.writeframes(struct.pack('<h', sample))
->>>>>>> f7f4ea9 (audio fix)
 
 except KeyboardInterrupt:
     print(f"\n📁 Saved as '{filename}'")
