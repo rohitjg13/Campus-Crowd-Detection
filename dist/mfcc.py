@@ -1,11 +1,9 @@
-import random
 from datetime import datetime
-
 import librosa
-import numpy as np
 import pandas as pd
+from os import system
 
-AUDIO_FILE = "backend/test_audio/input.wav"
+
 DURATION = 5
 SAMPLERATE = 5885
 N_MFCC = 13
@@ -60,19 +58,29 @@ def save_mfcc_to_csv(
 
     with open(filename, "a", newline="") as csvfile:
         writer = pd.DataFrame([row], columns=headers)
+        if file_exists:
+            try:
+                pd.read_csv(filename)
+            except:
+                backup_exists = False
+                try:
+                    with open("backup_mfcc_dataset.csv"):
+                        backup_exists = True
+                except FileNotFoundError:
+                    pass
+                if backup_exists:
+                    system("cp backup_mfcc_dataset.csv mfcc_dataset.csv")
+                else:
+                    system("rm mfcc_dataset.csv")
+                    file_exists = False
         writer.to_csv(csvfile, header=not file_exists, index=False)
 
     print(f"MFCC data saved to {filename}")
 
 
-audio_data, sr = load_audio(AUDIO_FILE, DURATION)
-mfcc_data = extract_mfcc(audio_data, sr)
-
-location_ids = ["location_1", "location_2", "location_3"]
-start_time = datetime.strptime("09:00", "%H:%M")
-
-
-def data(inp):
+def data(inp, mfcc_data):
+    location_ids = ["location_1", "location_2", "location_3"]
+    start_time = datetime.strptime("09:00", "%H:%M")
     for i in range(200):
         crowd_density = inp
         current_time = (start_time + pd.Timedelta(minutes=i * 5)).strftime("%I:%M %p")
@@ -83,6 +91,4 @@ def data(inp):
                 mfcc_data,
                 location_id,
                 crowd_density,
-                filename="mfcc_dataset.csv",
             )
-

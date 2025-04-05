@@ -1,14 +1,11 @@
+from mfcc import SAMPLERATE, DURATION
+import serial
 import struct
 import time
 import wave
 
-import serial
 
-# Setup serial connection
-ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=1)
-
-
-def record_from_mic(mic_number, duration=5):
+def record_from_mic(mic_number):
     """
     Record audio from a specific microphone for a set duration
 
@@ -19,23 +16,24 @@ def record_from_mic(mic_number, duration=5):
     Returns:
         Filename of the saved recording
     """
+    ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=1)
     # Tell Arduino which mic to use
     ser.write(str(mic_number).encode())
     time.sleep(0.1)  # Small delay to ensure command is received
 
     # Generate filename with timestamp and mic number
-    filename = f"mic{mic_number}_recording_{int(time.time())}.wav"
+    filename = f"/tmp/ccd/mic{mic_number}_recording.wav"
 
     # Setup WAV file
     wav_file = wave.open(filename, "wb")
     wav_file.setnchannels(1)  # Mono
     wav_file.setsampwidth(2)  # 16-bit PCM
-    wav_file.setframerate(5885)  # Sample rate
+    wav_file.setframerate(SAMPLERATE)  # Sample rate
 
-    print(f"🎙️ Recording from Mic {mic_number} for {duration} seconds...")
+    print(f"🎙️ Recording from Mic {mic_number} for {DURATION} seconds...")
 
     # Calculate end time
-    end_time = time.time() + duration
+    end_time = time.time() + DURATION
 
     # Record until duration is reached
     while time.time() < end_time:
@@ -56,28 +54,30 @@ def record_from_mic(mic_number, duration=5):
     return filename
 
 
-try:
-    # Record from each microphone sequentially
-    print("Starting sequential recording from all microphones...")
+def record_to_wav():
+    ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=1)
+    try:
+        # Record from each microphone sequentially
+        print("Starting sequential recording from all microphones...")
 
-    # Record from microphone 1
-    file1 = record_from_mic(1)
+        # Record from microphone 1
+        file1 = record_from_mic(1)
 
-    # Record from microphone 2
-    file2 = record_from_mic(2)
+        # Record from microphone 2
+        file2 = record_from_mic(2)
 
-    # Record from microphone 3
-    file3 = record_from_mic(3)
+        # Record from microphone 3
+        file3 = record_from_mic(3)
 
-    print("\n🎉 All recordings completed!")
-    print(f"Microphone 1: {file1}")
-    print(f"Microphone 2: {file2}")
-    print(f"Microphone 3: {file3}")
+        print("\n🎉 All recordings completed!")
+        print(f"Microphone 1: {file1}")
+        print(f"Microphone 2: {file2}")
+        print(f"Microphone 3: {file3}")
 
-except KeyboardInterrupt:
-    print("\n⚠️ Recording interrupted")
+    except KeyboardInterrupt:
+        print("\n⚠️ Recording interrupted")
 
-finally:
-    # Close serial connection
-    ser.close()
-    print("Serial connection closed")
+    finally:
+        # Close serial connection
+        ser.close()
+        print("Serial connection closed")
