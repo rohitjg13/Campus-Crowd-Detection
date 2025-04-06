@@ -14,8 +14,8 @@ def main():
         audio_data, sr = load_audio(AUDIO_FILE, DURATION)
         mfcc_data = extract_mfcc(audio_data, sr)
         crowd_data = capture_cv_crowd()
-        if crowd_data > 20:
-            crowd_data = 20
+        if crowd_data > MAX_CROWD:
+            crowd_data = MAX_CROWD
         data((crowd_data - MIN_CROWD) / (MAX_CROWD - MIN_CROWD), mfcc_data)
 
 
