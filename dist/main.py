@@ -13,7 +13,10 @@ def main():
         AUDIO_FILE = f"mic{i}_recording.wav"
         audio_data, sr = load_audio(AUDIO_FILE, DURATION)
         mfcc_data = extract_mfcc(audio_data, sr)
-        data((capture_cv_crowd() - MIN_CROWD) / (MAX_CROWD - MIN_CROWD), mfcc_data)
+        crowd_data = capture_cv_crowd()
+        if crowd_data > 20:
+            crowd_data = 20
+        data((crowd_data - MIN_CROWD) / (MAX_CROWD - MIN_CROWD), mfcc_data)
 
 
 if __name__ == "__main__":
