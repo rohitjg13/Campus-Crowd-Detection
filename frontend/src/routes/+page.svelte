@@ -274,6 +274,19 @@
 						pointBorderColor: '#4ade80'
 					},
 					{
+						label: 'Current Time',
+						data: [currentPoint],
+						borderColor: '#ef4444', // Red
+						backgroundColor: '#ef4444',
+						borderWidth: 0,
+						pointRadius: 6,
+						pointHoverRadius: 8,
+						pointBackgroundColor: '#ef4444',
+						pointBorderColor: '#ffffff',
+						pointBorderWidth: 2,
+						showLine: false
+					},
+					{
 						label: 'Future Prediction',
 						data: futureData,
 						borderColor: '#facc15', // Yellow
@@ -286,19 +299,6 @@
 						pointHoverRadius: 4,
 						pointBackgroundColor: '#facc15',
 						pointBorderColor: '#facc15'
-					},
-					{
-						label: 'Current Time',
-						data: [currentPoint],
-						borderColor: '#ef4444', // Red
-						backgroundColor: '#ef4444',
-						borderWidth: 0,
-						pointRadius: 6,
-						pointHoverRadius: 8,
-						pointBackgroundColor: '#ef4444',
-						pointBorderColor: '#ffffff',
-						pointBorderWidth: 2,
-						showLine: false
 					}
 				]
 			},
