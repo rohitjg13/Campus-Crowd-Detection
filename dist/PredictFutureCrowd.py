@@ -42,10 +42,10 @@ def train_and_save_model(file_path):
     print("Saving model and scaler...")
     with open('crowd_density_model.pkl', 'wb') as f:
         pickle.dump(model, f)
-    
+
     with open('X_scaler.pkl', 'wb') as f:
         pickle.dump(X_scaler, f)
-    
+
     print("Model and scaler saved successfully!")
     return model, X_scaler
 
