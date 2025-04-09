@@ -12,7 +12,7 @@ def capture_cv_crowd():
     result = results[0]
     probability_threshold = (
         0.75  # TODO: tweak probability threshold with representative images
-    )
+    ) sa
     people = 0
     for box in result.boxes:
         if box.cls[0] == 0 and box.conf[0] > probability_threshold:
