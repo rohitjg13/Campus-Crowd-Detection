@@ -358,6 +358,20 @@
 									weight: label === currentTimeLabel ? 'bold' : 'normal'
 								};
 							}
+						},
+						// CENTER THE CURRENT TIME - set center point to current time
+						afterFit: function(scale) {
+							const currentTimeIndex = scale.ticks.findIndex(tick => tick.label === currentTimeLabel);
+							if (currentTimeIndex >= 0) {
+								const centerPosition = scale.width / 2;
+								const tickWidth = scale.width / scale.ticks.length;
+								const currentTickPosition = (currentTimeIndex + 0.5) * tickWidth;
+								const offset = centerPosition - currentTickPosition;
+								
+								// Apply the offset to center the current time
+								scale.paddingLeft = Math.max(0, scale.paddingLeft + offset);
+								scale.paddingRight = Math.max(0, scale.paddingRight - offset);
+							}
 						}
 					}
 				},
